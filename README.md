@@ -1,2 +1,2 @@
 # OneAI-bot
-This is the AI chat bot which genertes both images and texts with voice assistance.
+This is an AI chat bot which generates both images and texts with voice assistance.
