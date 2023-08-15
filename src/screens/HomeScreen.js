@@ -8,53 +8,40 @@ import {
   Image,
   ScrollView,
   Alert,
+  TextInput,
+  StyleSheet,
 } from 'react-native';
-import Voice from '@react-native-community/voice';
+// import Voice from '@react-native-community/voice';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 // import { apiCall } from '../api/openAI';
 import Features from '../components/features';
 import { dummyMessages } from '../constants';
 // import Tts from 'react-native-tts';
+// import { ... } from 'expo';
+// import * as Permissions from 'expo-permissions';
+import FontIcon from 'react-native-vector-icons/FontAwesome';
+
 
 export default function HomeScreen() {
 
   const [messages, setMessages] = useState(dummyMessages);
-  const [recording, setRecording] = useState(false);
-  const [speaking, setSpeaking] = useState(false);
+  const [result, setResult] = useState('');
+  const [typedText, setTypedText] = useState(''); // State to store typed text
 
-
-  // //! Start-Stop Recording
-  const startRecording = async () => {
-    setRecording(true);
-    // Tts.stop(); 
-    // try {
-    //   await Voice.start('en-GB'); // en-US
-
-    // } catch (error) {
-    //   console.log('error', error);
-    // }
-  };
-  const stopRecording = async () => {
-    setRecording(false);
+  const handleTextSubmit = () => {
+    // Create a new message object and add it to the messages state
+    if (typedText.trim() !== '') {
+      const newMessage = {
+        role: 'user', // Assuming the role is 'user' for user input
+        content: typedText,
+      };
+      setMessages([...messages, newMessage]);
+      setTypedText('');
+    }
   };
 
-
-
-  // //! Button Functions
-
-  const clear = () => {
-    // Tts.stop();
-    // setSpeaking(false);
-    // setLoading(false);
-    setMessages([]);
-  };
-
-  const stopSpeaking = () => {
-    // Tts.stop();
-    setSpeaking(false);
-  }
-
-
+  console.log('messages', messages);
+  
 
   return (
     <View className="flex-1 bg-white">
@@ -143,55 +130,26 @@ export default function HomeScreen() {
         }
 
 
-        {/* //! recording, clear and stop buttons */}
-        <View className="flex justify-center items-center">
-          {
+        {/* //!  input box  */}
 
-            recording ? (
-              <TouchableOpacity className="space-y-2" onPress={stopRecording}>
-                {/* recording stop button */}
-                <Image
-                  className="rounded-full"
-                  source={require('../../assets/images/voiceLoading.gif')}
-                  style={{ width: hp(10), height: hp(10) }}
-                />
-              </TouchableOpacity>
-
-            ) : (
-              <TouchableOpacity onPress={startRecording}>
-                {/* recording start button */}
-                <Image
-                  className="rounded-full"
-                  source={require('../../assets/images/recordingIcon.png')}
-                  style={{ width: hp(10), height: hp(10) }}
-                />
-              </TouchableOpacity>
-            )
-          }
-          {
-            messages.length > 0 && (
-              <TouchableOpacity
-                onPress={clear}
-                className="bg-neutral-400 rounded-3xl p-2 absolute right-10"
-              >
-                <Text className="text-white font-semibold">Clear</Text>
-              </TouchableOpacity>
-            )
-          }
-          {
-            speaking && (
-              <TouchableOpacity
-                onPress={stopSpeaking}
-                className="bg-red-400 rounded-3xl p-2 absolute left-10"
-              >
-                <Text className="text-white font-semibold">Stop</Text>
-              </TouchableOpacity>
-            )
-          }
-
-
+        <View style={styles.container}>
+          <TextInput
+            placeholder="Start typing..."
+            style={styles.textInput}
+            value={typedText}
+            onChangeText={text => setTypedText(text)}
+            onSubmitEditing={handleTextSubmit} // This will be called when the user presses Enter/Submit
+          />
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={handleTextSubmit} // This will also submit the typed text
+          >
+            {/* <Text style={styles.submitButtonText}>Submit</Text> */}
+            <FontIcon name="send" size={20} color="white" />
+          </TouchableOpacity>
 
         </View>
+
 
       </SafeAreaView>
 
@@ -200,3 +158,43 @@ export default function HomeScreen() {
     </View>
   )
 }
+
+
+const styles = StyleSheet.create({
+  container: {
+    // flex: 1,
+    display: 'flex',
+    justifyContent: 'center',
+    textAlign: 'center',
+    // alignItems: 'space-between',
+    // backgroundColor: 'red',
+    marginBottom: 20,
+    padding: 10,
+    position:'relative'
+  },
+  textInput: {
+    height: 50,
+    width: '83%',
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+    backgroundColor: '#b4afaf',
+  },
+
+  submitButton: {
+    alignSelf: 'flex-end',
+    justifyContent: 'center',
+    backgroundColor: '#3498db',
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    marginTop: -40,
+    // backgroundColor: '#59a749',
+  },
+  submitButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});
